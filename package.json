@@ -1,5 +1,5 @@
 {
-  "name": "audio-recorder-widget",
+  "name": "audio-recorder-web",
   "version": "1.0.0",
   "description": "A powerful, embeddable audio recording widget with cross-browser compatibility",
   "main": "dist/audio-recorder.js",

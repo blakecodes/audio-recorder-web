@@ -1,4 +1,4 @@
-declare module 'audio-recorder-widget' {
+declare module 'audio-recorder-web' {
   export interface AudioRecorderOptions {
     container: string | HTMLElement;
     theme?: 'dark' | 'light';

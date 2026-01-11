@@ -30,14 +30,14 @@ A powerful, embeddable audio recording widget with cross-browser compatibility i
 ### Option 1: NPM (Recommended)
 
 ```bash
-npm install audio-recorder-widget
+npm install audio-recorder-web
 ```
 
 **ES Modules (React, Vue, Angular, etc.):**
 
 ```javascript
-import AudioRecorder from 'audio-recorder-widget';
-import 'audio-recorder-widget/dist/audio-recorder.css';
+import AudioRecorder from 'audio-recorder-web';
+import 'audio-recorder-web/dist/audio-recorder.css';
 
 const recorder = new AudioRecorder({
   container: '#my-recorder',
@@ -48,7 +48,7 @@ const recorder = new AudioRecorder({
 **CommonJS:**
 
 ```javascript
-const AudioRecorder = require('audio-recorder-widget');
+const AudioRecorder = require('audio-recorder-web');
 ```
 
 ### Option 2: Direct Download / CDN
@@ -71,15 +71,15 @@ Download the files and include them in your project:
 **unpkg CDN:**
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/audio-recorder-widget/dist/audio-recorder.css">
-<script src="https://unpkg.com/audio-recorder-widget/dist/audio-recorder.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/audio-recorder-web/dist/audio-recorder.css">
+<script src="https://unpkg.com/audio-recorder-web/dist/audio-recorder.min.js"></script>
 ```
 
 **jsDelivr CDN:**
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/audio-recorder-widget/dist/audio-recorder.css">
-<script src="https://cdn.jsdelivr.net/npm/audio-recorder-widget/dist/audio-recorder.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/audio-recorder-web/dist/audio-recorder.css">
+<script src="https://cdn.jsdelivr.net/npm/audio-recorder-web/dist/audio-recorder.min.js"></script>
 ```
 
 ## Quick Start
