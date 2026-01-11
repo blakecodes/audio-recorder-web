@@ -1,0 +1,17 @@
+# Development files
+scripts/
+*.html
+.gitignore
+.DS_Store
+*.log
+
+# Test files
+test/
+coverage/
+.nyc_output/
+
+# Config files
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json

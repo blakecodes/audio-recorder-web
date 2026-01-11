@@ -1,0 +1,48 @@
+{
+  "name": "audio-recorder-widget",
+  "version": "1.0.0",
+  "description": "A powerful, embeddable audio recording widget with cross-browser compatibility",
+  "main": "dist/audio-recorder.js",
+  "module": "dist/audio-recorder.esm.js",
+  "browser": "dist/audio-recorder.min.js",
+  "types": "dist/audio-recorder.d.ts",
+  "style": "dist/audio-recorder.css",
+  "files": [
+    "dist/",
+    "src/",
+    "flash/"
+  ],
+  "scripts": {
+    "build": "npm run build:js && npm run build:css && npm run build:types",
+    "build:js": "node scripts/build.js",
+    "build:css": "cp src/audio-recorder.css dist/audio-recorder.css && cp src/audio-recorder-ie.css dist/audio-recorder-ie.css",
+    "build:types": "cp src/audio-recorder.d.ts dist/audio-recorder.d.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/audio-recorder-widget.git"
+  },
+  "keywords": [
+    "audio",
+    "recorder",
+    "microphone",
+    "recording",
+    "widget",
+    "embed",
+    "voice",
+    "wav",
+    "webm",
+    "mediarecorder",
+    "web-audio"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/audio-recorder-widget/issues"
+  },
+  "homepage": "https://github.com/yourusername/audio-recorder-widget#readme",
+  "devDependencies": {
+    "terser": "^5.27.0"
+  }
+}

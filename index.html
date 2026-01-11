@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Audio Recorder - Web Plugin Demo</title>
+  <link rel="stylesheet" href="src/audio-recorder.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0a0a14 0%, #1a1a2e 50%, #16213e 100%);
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    
+    .page-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .page-bg::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(ellipse at 20% 30%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(72, 219, 251, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(254, 202, 87, 0.04) 0%, transparent 50%);
+      animation: bgFloat 20s ease-in-out infinite;
+    }
+    
+    @keyframes bgFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(2%, -2%) rotate(1deg); }
+      66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
+    }
+    
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: #fff;
+    }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #a0a0b0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    
+    .tagline {
+      font-size: 18px;
+      color: #a0a0b0;
+      margin-top: 12px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(72, 219, 251, 0.1);
+      border: 1px solid rgba(72, 219, 251, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #48dbfb;
+      margin-top: 20px;
+    }
+    
+    .demos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      margin-bottom: 80px;
+    }
+    
+    .demo-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .demo-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .demo-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    
+    .demo-card p {
+      font-size: 14px;
+      color: #a0a0b0;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    .recorder-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    
+    .feature {
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+    }
+    
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .feature-icon.red {
+      background: rgba(255, 107, 107, 0.15);
+    }
+    .feature-icon.red svg { fill: #ff6b6b; }
+    
+    .feature-icon.blue {
+      background: rgba(72, 219, 251, 0.15);
+    }
+    .feature-icon.blue svg { fill: #48dbfb; }
+    
+    .feature-icon.yellow {
+      background: rgba(254, 202, 87, 0.15);
+    }
+    .feature-icon.yellow svg { fill: #feca57; }
+    
+    .feature-icon.green {
+      background: rgba(38, 222, 129, 0.15);
+    }
+    .feature-icon.green svg { fill: #26de81; }
+    
+    .feature h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .feature p {
+      font-size: 13px;
+      color: #a0a0b0;
+      line-height: 1.6;
+    }
+    
+    .code-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .code-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .code-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .code-dot.red { background: #ff6b6b; }
+    .code-dot.yellow { background: #feca57; }
+    .code-dot.green { background: #26de81; }
+    
+    .code-title {
+      margin-left: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #a0a0b0;
+    }
+    
+    pre {
+      padding: 24px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e0e0e0;
+    }
+    
+    .code-comment { color: #6a6a8a; }
+    .code-tag { color: #ff6b6b; }
+    .code-attr { color: #feca57; }
+    .code-string { color: #48dbfb; }
+    .code-keyword { color: #ff6b6b; }
+    .code-var { color: #a29bfe; }
+    .code-func { color: #26de81; }
+    .code-prop { color: #feca57; }
+    
+    footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    footer p {
+      font-size: 14px;
+      color: #6a6a8a;
+    }
+    
+    .browser-support {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .browser {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      min-width: 80px;
+    }
+    
+    .browser svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .browser span {
+      font-size: 12px;
+      color: #a0a0b0;
+    }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: 32px; }
+      .tagline { font-size: 16px; }
+      .container { padding: 40px 16px; }
+      .demos { gap: 24px; }
+      .demo-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-bg"></div>
+  
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+        <h1>Audio Recorder</h1>
+      </div>
+      <p class="tagline">A powerful, embeddable audio recording widget with cross-browser compatibility including legacy Internet Explorer support.</p>
+      <div class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        Cross-Browser Compatible
+      </div>
+    </header>
+    
+    <div class="demos">
+      <div class="demo-card">
+        <h3>Standard (Dark Theme)</h3>
+        <p>The default dark theme perfect for modern applications with a sleek, professional appearance.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-dark"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card" style="background: rgba(255,255,255,0.95);">
+        <h3 style="color: #1a1a2e;">Standard (Light Theme)</h3>
+        <p style="color: #6c757d;">A clean light theme that integrates seamlessly with light-colored websites.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-light"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h3>Mini Recorder</h3>
+        <p>A compact inline recorder with just buttons and a level indicator. Perfect for embedding in forms or tight spaces.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-mini"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h3>Mini (Light, No Download)</h3>
+        <p>Mini variant with configurable buttons. This example hides the download button for a cleaner look.</p>
+        <div class="recorder-wrapper" style="background: #f8f9fa; padding: 16px; border-radius: 8px;">
+          <div id="recorder-mini-light"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h3>Record Only</h3>
+        <p>Minimal configuration with only record and stop buttons. Great for simple voice note capture.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-simple"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h3>Compact Variant</h3>
+        <p>A smaller version of the standard recorder for tighter layouts while keeping all features.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-compact"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon red">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+        <h4>High Quality Recording</h4>
+        <p>Records audio using MediaRecorder API with automatic codec selection for optimal quality.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon blue">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <h4>Cross-Browser Support</h4>
+        <p>Works on Chrome, Firefox, Safari, Edge, and legacy Internet Explorer via Flash fallback.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon yellow">
+          <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+        </div>
+        <h4>Live Visualization</h4>
+        <p>Real-time audio waveform visualization using Web Audio API for visual feedback during recording.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon green">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        </div>
+        <h4>Easy Export</h4>
+        <p>Download recordings as WAV or WebM files, or access the blob directly via JavaScript API.</p>
+      </div>
+    </div>
+    
+    <div class="code-section">
+      <div class="code-header">
+        <div class="code-dot red"></div>
+        <div class="code-dot yellow"></div>
+        <div class="code-dot green"></div>
+        <span class="code-title">integration.html</span>
+      </div>
+      <pre><code><span class="code-comment">&lt;!-- Include CSS and JS --&gt;</span>
+<span class="code-tag">&lt;link</span> <span class="code-attr">rel=</span><span class="code-string">"stylesheet"</span> <span class="code-attr">href=</span><span class="code-string">"audio-recorder.css"</span><span class="code-tag">&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src=</span><span class="code-string">"audio-recorder.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+
+<span class="code-comment">&lt;!-- Add container element --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">id=</span><span class="code-string">"my-recorder"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+
+<span class="code-comment">&lt;!-- Initialize recorder --&gt;</span>
+<span class="code-tag">&lt;script&gt;</span>
+<span class="code-keyword">var</span> <span class="code-var">recorder</span> = <span class="code-keyword">new</span> <span class="code-func">AudioRecorder</span>({
+  <span class="code-prop">container</span>: <span class="code-string">'#my-recorder'</span>,
+  <span class="code-prop">theme</span>: <span class="code-string">'dark'</span>,
+  <span class="code-prop">maxDuration</span>: <span class="code-string">300</span>,
+  <span class="code-prop">onData</span>: <span class="code-keyword">function</span>(<span class="code-var">data</span>) {
+    <span class="code-var">console</span>.<span class="code-func">log</span>(<span class="code-string">'Recording complete!'</span>, <span class="code-var">data</span>.<span class="code-prop">blob</span>);
+  }
+});
+<span class="code-tag">&lt;/script&gt;</span></code></pre>
+    </div>
+    
+    <footer>
+      <p>Supported Browsers</p>
+      <div class="browser-support">
+        <div class="browser">
+          <svg viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          <span>Chrome</span>
+        </div>
+        <div class="browser">
+          <svg viewBox="0 0 24 24" fill="#FF6611"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg>
+          <span>Firefox</span>
+        </div>
+        <div class="browser">
+          <svg viewBox="0 0 24 24" fill="#006CFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+          <span>Safari</span>
+        </div>
+        <div class="browser">
+          <svg viewBox="0 0 24 24" fill="#0078D7"><path d="M21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-9 7c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/></svg>
+          <span>Edge</span>
+        </div>
+        <div class="browser">
+          <svg viewBox="0 0 24 24" fill="#1EBBEE"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span>IE 9+</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.14/es5-shim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.14/es5-sham.min.js"></script>
+  <![endif]-->
+  
+  <script src="src/audio-recorder.js"></script>
+  <script>
+    (function() {
+      var recorderDark = new AudioRecorder({
+        container: '#recorder-dark',
+        theme: 'dark',
+        maxDuration: 300,
+        onStart: function() { console.log('Dark: Recording started'); },
+        onStop: function() { console.log('Dark: Recording stopped'); },
+        onData: function(data) { console.log('Dark: Recording data:', data); },
+        onError: function(error) { console.error('Dark: Recording error:', error); }
+      });
+
+      var recorderLight = new AudioRecorder({
+        container: '#recorder-light',
+        theme: 'light',
+        maxDuration: 300,
+        onData: function(data) { console.log('Light: Recording data:', data); }
+      });
+
+      var recorderMini = new AudioRecorder({
+        container: '#recorder-mini',
+        theme: 'dark',
+        variant: 'mini',
+        maxDuration: 60,
+        onData: function(data) { console.log('Mini: Recording data:', data); }
+      });
+
+      var recorderMiniLight = new AudioRecorder({
+        container: '#recorder-mini-light',
+        theme: 'light',
+        variant: 'mini',
+        showDownload: false,
+        maxDuration: 60,
+        onData: function(data) { console.log('Mini Light: Recording data:', data); }
+      });
+
+      var recorderSimple = new AudioRecorder({
+        container: '#recorder-simple',
+        theme: 'dark',
+        variant: 'mini',
+        showPause: false,
+        showPlay: false,
+        showDownload: false,
+        showTimer: false,
+        maxDuration: 30,
+        onData: function(data) { console.log('Simple: Recording data:', data); }
+      });
+
+      var recorderCompact = new AudioRecorder({
+        container: '#recorder-compact',
+        theme: 'dark',
+        variant: 'compact',
+        maxDuration: 120,
+        onData: function(data) { console.log('Compact: Recording data:', data); }
+      });
+
+      console.log('AudioRecorder capabilities:', AudioRecorder.getCapabilities());
+      console.log('AudioRecorder supported:', AudioRecorder.isSupported());
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+.ar-recorder {
+  --ar-bg-primary: #1a1a2e;
+  --ar-bg-secondary: #16213e;
+  --ar-bg-tertiary: #0f0f1a;
+  --ar-text-primary: #ffffff;
+  --ar-text-secondary: #a0a0b0;
+  --ar-accent: #ff6b6b;
+  --ar-accent-hover: #ff8585;
+  --ar-success: #48dbfb;
+  --ar-warning: #feca57;
+  --ar-border: #2d2d44;
+  --ar-shadow: rgba(0, 0, 0, 0.4);
+  --ar-radius: 12px;
+  --ar-radius-sm: 8px;
+  --ar-transition: 0.2s ease;
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  background: var(--ar-bg-primary);
+  border-radius: var(--ar-radius);
+  box-shadow: 0 8px 32px var(--ar-shadow);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.ar-recorder *,
+.ar-recorder *::before,
+.ar-recorder *::after {
+  box-sizing: border-box;
+}
+
+.ar-theme-light.ar-recorder {
+  --ar-bg-primary: #ffffff;
+  --ar-bg-secondary: #f8f9fa;
+  --ar-bg-tertiary: #e9ecef;
+  --ar-text-primary: #1a1a2e;
+  --ar-text-secondary: #6c757d;
+  --ar-border: #dee2e6;
+  --ar-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.ar-visualizer {
+  position: relative;
+  height: 100px;
+  background: linear-gradient(135deg, var(--ar-bg-tertiary) 0%, var(--ar-bg-secondary) 100%);
+  border-bottom: 1px solid var(--ar-border);
+}
+
+.ar-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ar-status {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ar-status-text {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ar-text-secondary);
+  background: var(--ar-bg-primary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--ar-border);
+}
+
+.ar-recording .ar-status-text {
+  color: var(--ar-accent);
+  border-color: var(--ar-accent);
+  animation: ar-pulse 1.5s ease-in-out infinite;
+}
+
+.ar-recording .ar-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--ar-accent);
+  border-radius: 50%;
+  animation: ar-blink 1s ease-in-out infinite;
+}
+
+@keyframes ar-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes ar-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.ar-paused .ar-status-text {
+  color: var(--ar-warning);
+  border-color: var(--ar-warning);
+  animation: none;
+}
+
+.ar-paused .ar-status::before {
+  background: var(--ar-warning);
+  animation: none;
+}
+
+.ar-timer {
+  padding: 16px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ar-text-primary);
+  background: var(--ar-bg-secondary);
+  letter-spacing: 2px;
+}
+
+.ar-recording .ar-timer {
+  color: var(--ar-accent);
+}
+
+.ar-paused .ar-timer {
+  color: var(--ar-warning);
+}
+
+.ar-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--ar-bg-primary);
+}
+
+.ar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--ar-bg-secondary);
+  color: var(--ar-text-primary);
+  cursor: pointer;
+  transition: all var(--ar-transition);
+  border: 2px solid var(--ar-border);
+}
+
+.ar-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  border-color: var(--ar-text-secondary);
+}
+
+.ar-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.ar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ar-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.ar-btn-record {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+}
+
+.ar-btn-record:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff8585 0%, #ff6b6b 100%);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+}
+
+.ar-btn-record svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+.ar-btn-record:disabled {
+  background: var(--ar-bg-tertiary);
+  box-shadow: none;
+}
+
+.ar-btn-pause.ar-active {
+  background: var(--ar-warning);
+  border-color: var(--ar-warning);
+  color: var(--ar-bg-primary);
+}
+
+.ar-btn-play.ar-playing {
+  background: var(--ar-success);
+  border-color: var(--ar-success);
+  color: var(--ar-bg-primary);
+  animation: ar-pulse 1s ease-in-out infinite;
+}
+
+.ar-btn-stop:hover:not(:disabled) {
+  background: var(--ar-accent);
+  border-color: var(--ar-accent);
+  color: #fff;
+}
+
+.ar-btn-download:hover:not(:disabled) {
+  background: var(--ar-success);
+  border-color: var(--ar-success);
+  color: var(--ar-bg-primary);
+}
+
+.ar-flash-container {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.ar-error {
+  display: none;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+
+@media (max-width: 360px) {
+  .ar-recorder {
+    border-radius: 0;
+  }
+  
+  .ar-controls {
+    gap: 8px;
+    padding: 16px;
+  }
+  
+  .ar-btn {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .ar-btn-record {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .ar-timer {
+    font-size: 28px;
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-recorder,
+  .ar-btn,
+  .ar-status-text {
+    transition: none;
+    animation: none;
+  }
+}
+
+.ar-recorder-inline {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: none;
+  width: auto;
+}
+
+.ar-recorder-compact {
+  max-width: 280px;
+}
+
+.ar-recorder-compact .ar-visualizer {
+  height: 60px;
+}
+
+.ar-recorder-compact .ar-timer {
+  font-size: 24px;
+  padding: 10px;
+}
+
+.ar-recorder-compact .ar-controls {
+  padding: 12px;
+  gap: 8px;
+}
+
+.ar-recorder-compact .ar-btn {
+  width: 38px;
+  height: 38px;
+}
+
+.ar-recorder-compact .ar-btn-record {
+  width: 44px;
+  height: 44px;
+}
+
+.ar-recorder-compact .ar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ar-recorder-minimal {
+  max-width: 200px;
+}
+
+.ar-recorder-minimal .ar-visualizer {
+  display: none;
+}
+
+.ar-recorder-minimal .ar-timer {
+  font-size: 20px;
+  padding: 8px;
+}
+
+.ar-recorder-minimal .ar-controls {
+  padding: 10px;
+  gap: 6px;
+}
+
+.ar-recorder-minimal .ar-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.ar-recorder-minimal .ar-btn-record {
+  width: 38px;
+  height: 38px;
+}
+
+.ar-recorder-minimal .ar-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ar-variant-mini {
+  max-width: none;
+  width: auto;
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: var(--ar-radius-sm);
+}
+
+.ar-mini-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.ar-variant-mini .ar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+}
+
+.ar-variant-mini .ar-btn {
+  width: 36px;
+  height: 36px;
+  border-width: 1.5px;
+}
+
+.ar-variant-mini .ar-btn-record {
+  width: 42px;
+  height: 42px;
+}
+
+.ar-variant-mini .ar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ar-variant-mini .ar-btn-record svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ar-level-indicator {
+  width: 60px;
+  height: 8px;
+  background: var(--ar-bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--ar-border);
+}
+
+.ar-level-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--ar-success);
+  border-radius: 3px;
+  transition: width 0.1s ease, background 0.2s ease;
+}
+
+.ar-recording .ar-level-bar {
+  animation: ar-level-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ar-level-pulse {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
+}
+
+.ar-mini-timer {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+  background: transparent;
+  color: var(--ar-text-secondary);
+  min-width: 45px;
+  text-align: center;
+}
+
+.ar-recording .ar-mini-timer {
+  color: var(--ar-accent);
+}
+
+.ar-variant-minimal .ar-visualizer {
+  display: none;
+}
+
+.ar-variant-compact {
+  max-width: 280px;
+}
+
+.ar-variant-compact .ar-visualizer {
+  height: 60px;
+}
+
+.ar-variant-compact .ar-timer {
+  font-size: 24px;
+  padding: 10px;
+}
+
+.ar-variant-compact .ar-controls {
+  padding: 12px;
+  gap: 8px;
+}
+
+.ar-variant-compact .ar-btn {
+  width: 38px;
+  height: 38px;
+}
+
+.ar-variant-compact .ar-btn-record {
+  width: 44px;
+  height: 44px;
+}
+
+.ar-variant-compact .ar-btn svg {
+  width: 16px;
+  height: 16px;
+}

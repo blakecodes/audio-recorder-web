@@ -1,0 +1,218 @@
+/* Internet Explorer specific styles */
+/* Include this file after audio-recorder.css for IE 9-11 support */
+
+.ar-recorder {
+  background: #1a1a2e;
+  -ms-border-radius: 12px;
+}
+
+.ar-theme-light.ar-recorder {
+  background: #ffffff;
+}
+
+.ar-visualizer {
+  background: #0f0f1a;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.ar-theme-light .ar-visualizer {
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.ar-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ar-status-text {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #a0a0b0;
+  background: #1a1a2e;
+  padding: 4px 10px;
+  -ms-border-radius: 20px;
+  border: 1px solid #2d2d44;
+}
+
+.ar-recording .ar-status-text {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.ar-paused .ar-status-text {
+  color: #feca57;
+  border-color: #feca57;
+}
+
+.ar-timer {
+  padding: 16px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #16213e;
+}
+
+.ar-theme-light .ar-timer {
+  color: #1a1a2e;
+  background: #f8f9fa;
+}
+
+.ar-recording .ar-timer {
+  color: #ff6b6b;
+}
+
+.ar-paused .ar-timer {
+  color: #feca57;
+}
+
+.ar-controls {
+  display: table;
+  width: 100%;
+  padding: 20px;
+  background: #1a1a2e;
+  text-align: center;
+}
+
+.ar-theme-light .ar-controls {
+  background: #ffffff;
+}
+
+.ar-btn {
+  display: inline-block;
+  vertical-align: middle;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  margin: 0 6px;
+  border: 2px solid #2d2d44;
+  -ms-border-radius: 50%;
+  background: #16213e;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  line-height: 44px;
+}
+
+.ar-theme-light .ar-btn {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #1a1a2e;
+}
+
+.ar-btn:hover {
+  border-color: #a0a0b0;
+}
+
+.ar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: alpha(opacity=35);
+}
+
+.ar-btn svg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  fill: currentColor;
+}
+
+.ar-btn-record {
+  width: 56px;
+  height: 56px;
+  background: #ff6b6b;
+  border: none;
+  line-height: 52px;
+}
+
+.ar-btn-record:hover {
+  background: #ff8585;
+}
+
+.ar-btn-record svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+.ar-btn-record:disabled {
+  background: #0f0f1a;
+}
+
+.ar-btn-pause.ar-active {
+  background: #feca57;
+  border-color: #feca57;
+  color: #1a1a2e;
+}
+
+.ar-btn-play.ar-playing {
+  background: #48dbfb;
+  border-color: #48dbfb;
+  color: #1a1a2e;
+}
+
+.ar-btn-stop:hover {
+  background: #ff6b6b;
+  border-color: #ff6b6b;
+  color: #fff;
+}
+
+.ar-btn-download:hover {
+  background: #48dbfb;
+  border-color: #48dbfb;
+  color: #1a1a2e;
+}
+
+.ar-flash-container {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.ar-error {
+  display: none;
+  padding: 12px 16px;
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* IE9 specific - inline-block fix */
+.ar-controls {
+  *display: block;
+}
+
+.ar-btn {
+  *display: inline;
+  zoom: 1;
+}
+
+/* IE8 and below - basic layout */
+.ar-recorder-ie8 .ar-visualizer {
+  display: none;
+}
+
+.ar-recorder-ie8 .ar-controls {
+  padding: 10px;
+}
+
+.ar-recorder-ie8 .ar-btn {
+  width: 40px;
+  height: 40px;
+  line-height: 36px;
+  margin: 0 4px;
+}
+
+.ar-recorder-ie8 .ar-btn-record {
+  width: 48px;
+  height: 48px;
+  line-height: 44px;
+}
