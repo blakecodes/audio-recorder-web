@@ -988,8 +988,13 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
   AudioRecorder.prototype._updateButtons = function(state) {
     var btns = this.elements;
     
-    btns.btnRecord.disabled = state !== 'idle' && state !== 'stopped';
-    btns.btnStop.disabled = state !== 'recording' && state !== 'paused';
+    if (btns.btnRecord) {
+      btns.btnRecord.disabled = state !== 'idle' && state !== 'stopped';
+    }
+    
+    if (btns.btnStop) {
+      btns.btnStop.disabled = state !== 'recording' && state !== 'paused';
+    }
     
     if (btns.btnPause) {
       btns.btnPause.disabled = state !== 'recording' && state !== 'paused';
