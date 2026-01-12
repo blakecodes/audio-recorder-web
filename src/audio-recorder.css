@@ -21,7 +21,7 @@
   background: var(--ar-bg-primary);
   border-radius: var(--ar-radius);
   box-shadow: 0 8px 32px var(--ar-shadow);
-  overflow: hidden;
+  position: relative;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -666,10 +666,6 @@
   opacity: 1;
   visibility: visible;
   transform: translateY(8px);
-}
-
-.ar-recorder {
-  position: relative;
 }
 
 .ar-settings-header {
