@@ -609,3 +609,177 @@
 .ar-variant-button .ar-error {
   position: absolute;
 }
+
+.ar-btn-settings {
+  background: transparent;
+  border: 1px solid var(--ar-border);
+}
+
+.ar-btn-settings:hover:not(:disabled) {
+  background: var(--ar-bg-secondary);
+  border-color: var(--ar-text-secondary);
+}
+
+.ar-btn-settings svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ar-settings-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: var(--ar-bg-primary);
+  border-radius: 50%;
+  opacity: 0.7;
+  z-index: 10;
+}
+
+.ar-settings-overlay:hover {
+  opacity: 1;
+}
+
+.ar-settings-overlay svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ar-settings-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 280px;
+  background: var(--ar-bg-primary);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
+  box-shadow: 0 8px 24px var(--ar-shadow);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--ar-transition);
+}
+
+.ar-settings-panel.ar-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(8px);
+}
+
+.ar-recorder {
+  position: relative;
+}
+
+.ar-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ar-border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ar-text-primary);
+}
+
+.ar-settings-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--ar-text-secondary);
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 4px;
+  transition: all var(--ar-transition);
+}
+
+.ar-settings-close:hover {
+  background: var(--ar-bg-secondary);
+  color: var(--ar-text-primary);
+}
+
+.ar-settings-content {
+  padding: 14px;
+}
+
+.ar-device-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--ar-bg-secondary);
+  border: 1px solid var(--ar-border);
+  border-radius: var(--ar-radius-sm);
+  color: var(--ar-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--ar-transition);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0a0b0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
+  padding-right: 32px;
+}
+
+.ar-device-select:hover {
+  border-color: var(--ar-text-secondary);
+}
+
+.ar-device-select:focus {
+  outline: none;
+  border-color: var(--ar-accent);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+}
+
+.ar-device-select option {
+  background: var(--ar-bg-primary);
+  color: var(--ar-text-primary);
+  padding: 8px;
+}
+
+.ar-theme-light .ar-device-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+.ar-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ar-variant-button .ar-btn-settings {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--ar-bg-secondary);
+  border: 2px solid var(--ar-border);
+}
+
+.ar-variant-button .ar-btn-settings svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ar-variant-button .ar-btn-settings:hover {
+  border-color: var(--ar-text-secondary);
+}
+
+.ar-variant-button .ar-settings-panel {
+  right: auto;
+  left: 0;
+}
+
+.ar-variant-mini .ar-btn-settings {
+  width: 32px;
+  height: 32px;
+}
+
+.ar-variant-mini .ar-btn-settings svg {
+  width: 14px;
+  height: 14px;
+}

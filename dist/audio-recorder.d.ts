@@ -13,6 +13,7 @@ declare module 'audio-recorder-web' {
     showDownload?: boolean;
     showTimer?: boolean;
     showStatus?: boolean;
+    showSettings?: boolean;
     onStart?: () => void;
     onStop?: () => void;
     onPause?: () => void;
@@ -21,6 +22,7 @@ declare module 'audio-recorder-web' {
     onError?: (error: string) => void;
     onPermissionGranted?: () => void;
     onPermissionDenied?: () => void;
+    onDeviceChange?: (deviceId: string | null, label: string) => void;
   }
 
   export interface AudioRecorderData {
@@ -35,6 +37,11 @@ declare module 'audio-recorder-web' {
     legacyGetUserMedia: boolean;
     audioContext: boolean;
     flash: boolean;
+  }
+
+  export interface AudioDevice {
+    deviceId: string | null;
+    label: string;
   }
 
   export default class AudioRecorder {
@@ -55,6 +62,8 @@ declare module 'audio-recorder-web' {
     getDuration(): number;
     reset(): void;
     destroy(): void;
+    getSelectedDevice(): AudioDevice;
+    setDevice(deviceId: string | null): void;
 
     static isSupported(): boolean;
     static getCapabilities(): AudioRecorderCapabilities;

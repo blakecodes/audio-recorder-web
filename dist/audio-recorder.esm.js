@@ -18,13 +18,15 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
       onError: function() {},
       onPermissionGranted: function() {},
       onPermissionDenied: function() {},
+      onDeviceChange: function() {},
       theme: 'dark',
       variant: 'standard',
       showPause: true,
       showPlay: true,
       showDownload: true,
       showTimer: true,
-      showStatus: true
+      showStatus: true,
+      showSettings: true
     }, options || {});
 
     this.isRecording = false;
@@ -34,6 +36,8 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
     this.mediaStream = null;
     this.mediaRecorder = null;
     this.audioChunks = [];
+    this.selectedDeviceId = null;
+    this.audioDevices = [];
     this.recordingMode = null;
     this.timerInterval = null;
     this.analyser = null;
@@ -121,17 +125,24 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
     var html = ['<div class="ar-recorder ar-theme-' + opts.theme + variantClass + '">'];
     
     if (isButton) {
-      html.push('  <button class="ar-btn-single" type="button" title="Click to record">');
-      html.push('    <div class="ar-btn-single-icon">');
-      html.push('      <svg class="ar-icon-mic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
-      html.push('      <svg class="ar-icon-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>');
-      html.push('    </div>');
-      html.push('    <div class="ar-btn-single-content">');
-      html.push('      <span class="ar-btn-single-label">Record</span>');
-      html.push('      <span class="ar-btn-single-timer">00:00</span>');
-      html.push('    </div>');
-      html.push('    <div class="ar-btn-single-level"><div class="ar-btn-single-level-bar"></div></div>');
-      html.push('  </button>');
+      html.push('  <div class="ar-button-wrapper">');
+      html.push('    <button class="ar-btn-single" type="button" title="Click to record">');
+      html.push('      <div class="ar-btn-single-icon">');
+      html.push('        <svg class="ar-icon-mic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
+      html.push('        <svg class="ar-icon-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>');
+      html.push('      </div>');
+      html.push('      <div class="ar-btn-single-content">');
+      html.push('        <span class="ar-btn-single-label">Record</span>');
+      html.push('        <span class="ar-btn-single-timer">00:00</span>');
+      html.push('      </div>');
+      html.push('      <div class="ar-btn-single-level"><div class="ar-btn-single-level-bar"></div></div>');
+      html.push('    </button>');
+      if (opts.showSettings) {
+        html.push('    <button class="ar-btn ar-btn-settings" type="button" title="Audio Settings">');
+        html.push('      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>');
+        html.push('    </button>');
+      }
+      html.push('  </div>');
     } else if (isMini) {
       html.push('  <div class="ar-mini-wrapper">');
       html.push('    <div class="ar-level-indicator"><div class="ar-level-bar"></div></div>');
@@ -140,6 +151,11 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
       html.push('    <canvas class="ar-canvas"></canvas>');
       if (opts.showStatus) {
         html.push('    <div class="ar-status"><span class="ar-status-text">Ready</span></div>');
+      }
+      if (opts.showSettings) {
+        html.push('    <button class="ar-btn ar-btn-settings ar-settings-overlay" type="button" title="Audio Settings">');
+        html.push('      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>');
+        html.push('    </button>');
       }
       html.push('  </div>');
     }
@@ -176,6 +192,12 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
         html.push('    </button>');
       }
       
+      if (opts.showSettings && (isMini || isMinimal)) {
+        html.push('    <button class="ar-btn ar-btn-settings" type="button" title="Audio Settings">');
+        html.push('      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>');
+        html.push('    </button>');
+      }
+      
       html.push('  </div>');
       
       if (isMini) {
@@ -186,6 +208,15 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
       }
     }
     
+    html.push('  <div class="ar-settings-panel">');
+    html.push('    <div class="ar-settings-header">');
+    html.push('      <span>Audio Input</span>');
+    html.push('      <button class="ar-settings-close" type="button">&times;</button>');
+    html.push('    </div>');
+    html.push('    <div class="ar-settings-content">');
+    html.push('      <select class="ar-device-select"><option value="">Default Microphone</option></select>');
+    html.push('    </div>');
+    html.push('  </div>');
     html.push('  <div class="ar-flash-container"></div>');
     html.push('  <div class="ar-error"></div>');
     html.push('</div>');
@@ -202,6 +233,10 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
       btnStop: this.container.querySelector('.ar-btn-stop'),
       btnPlay: this.container.querySelector('.ar-btn-play'),
       btnDownload: this.container.querySelector('.ar-btn-download'),
+      btnSettings: this.container.querySelector('.ar-btn-settings'),
+      settingsPanel: this.container.querySelector('.ar-settings-panel'),
+      settingsClose: this.container.querySelector('.ar-settings-close'),
+      deviceSelect: this.container.querySelector('.ar-device-select'),
       flashContainer: this.container.querySelector('.ar-flash-container'),
       error: this.container.querySelector('.ar-error'),
       levelIndicator: this.container.querySelector('.ar-level-indicator'),
@@ -272,6 +307,34 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
       });
     }
 
+    if (this.elements.btnSettings) {
+      this.elements.btnSettings.addEventListener('click', function(e) {
+        e.stopPropagation();
+        self._toggleSettings();
+      });
+    }
+
+    if (this.elements.settingsClose) {
+      this.elements.settingsClose.addEventListener('click', function() {
+        self._hideSettings();
+      });
+    }
+
+    if (this.elements.deviceSelect) {
+      this.elements.deviceSelect.addEventListener('change', function() {
+        self._selectDevice(this.value);
+      });
+    }
+
+    document.addEventListener('click', function(e) {
+      if (self.elements.settingsPanel && 
+          self.elements.settingsPanel.classList.contains('ar-visible') &&
+          !self.elements.settingsPanel.contains(e.target) &&
+          (!self.elements.btnSettings || !self.elements.btnSettings.contains(e.target))) {
+        self._hideSettings();
+      }
+    });
+
     global.addEventListener('resize', function() {
       if (self.elements.canvas) {
         self._resizeCanvas();
@@ -334,7 +397,11 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
 
   AudioRecorder.prototype._startMediaRecorder = function() {
     var self = this;
-    var constraints = { audio: true };
+    var constraints = { 
+      audio: this.selectedDeviceId 
+        ? { deviceId: { exact: this.selectedDeviceId } } 
+        : true 
+    };
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function(stream) {
@@ -386,9 +453,14 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
     var self = this;
     var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || 
       navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    var constraints = { 
+      audio: this.selectedDeviceId 
+        ? { deviceId: { exact: this.selectedDeviceId } } 
+        : true 
+    };
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
+      navigator.mediaDevices.getUserMedia(constraints)
         .then(function(stream) {
           self._initWebAudioRecording(stream);
         })
@@ -1014,6 +1086,81 @@ const global = typeof window !== 'undefined' ? window : typeof globalThis !== 'u
     if (btns.btnDownload) {
       btns.btnDownload.disabled = state !== 'stopped';
     }
+  };
+
+  AudioRecorder.prototype._toggleSettings = function() {
+    if (this.elements.settingsPanel.classList.contains('ar-visible')) {
+      this._hideSettings();
+    } else {
+      this._showSettings();
+    }
+  };
+
+  AudioRecorder.prototype._showSettings = function() {
+    var self = this;
+    this.elements.settingsPanel.classList.add('ar-visible');
+    this._loadDevices();
+  };
+
+  AudioRecorder.prototype._hideSettings = function() {
+    this.elements.settingsPanel.classList.remove('ar-visible');
+  };
+
+  AudioRecorder.prototype._loadDevices = function() {
+    var self = this;
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      console.warn('enumerateDevices not supported');
+      return;
+    }
+    
+    navigator.mediaDevices.enumerateDevices().then(function(devices) {
+      self.audioDevices = devices.filter(function(d) {
+        return d.kind === 'audioinput';
+      });
+      
+      var select = self.elements.deviceSelect;
+      var currentValue = self.selectedDeviceId || '';
+      
+      select.innerHTML = '<option value="">Default Microphone</option>';
+      
+      self.audioDevices.forEach(function(device, index) {
+        var option = document.createElement('option');
+        option.value = device.deviceId;
+        option.textContent = device.label || ('Microphone ' + (index + 1));
+        if (device.deviceId === currentValue) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+    }).catch(function(err) {
+      console.warn('Could not enumerate audio devices:', err);
+    });
+  };
+
+  AudioRecorder.prototype._selectDevice = function(deviceId) {
+    this.selectedDeviceId = deviceId || null;
+    this.options.onDeviceChange(deviceId, this._getSelectedDeviceLabel());
+    this._hideSettings();
+  };
+
+  AudioRecorder.prototype._getSelectedDeviceLabel = function() {
+    if (!this.selectedDeviceId) return 'Default Microphone';
+    var device = this.audioDevices.find(function(d) {
+      return d.deviceId === this.selectedDeviceId;
+    }.bind(this));
+    return device ? (device.label || 'Microphone') : 'Default Microphone';
+  };
+
+  AudioRecorder.prototype.getSelectedDevice = function() {
+    return {
+      deviceId: this.selectedDeviceId,
+      label: this._getSelectedDeviceLabel()
+    };
+  };
+
+  AudioRecorder.prototype.setDevice = function(deviceId) {
+    this.selectedDeviceId = deviceId || null;
   };
 
   AudioRecorder.prototype._setStatus = function(text) {
