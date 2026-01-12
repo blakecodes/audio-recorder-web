@@ -1,6 +1,8 @@
 (function(global) {
   'use strict';
 
+  var STORAGE_KEY = 'audioRecorder_selectedDevice';
+
   var AudioRecorder = function(options) {
     this.options = this._extend({
       container: null,
@@ -25,7 +27,8 @@
       showDownload: true,
       showTimer: true,
       showStatus: true,
-      showSettings: true
+      showSettings: true,
+      liveVisualization: true
     }, options || {});
 
     this.isRecording = false;
@@ -35,13 +38,17 @@
     this.mediaStream = null;
     this.mediaRecorder = null;
     this.audioChunks = [];
-    this.selectedDeviceId = null;
+    this.selectedDeviceId = this._loadDeviceFromStorage();
     this.audioDevices = [];
     this.recordingMode = null;
     this.timerInterval = null;
     this.analyser = null;
     this.dataArray = null;
     this.animationFrame = null;
+    this.previewStream = null;
+    this.previewAnimationFrame = null;
+    this.previewAnalyser = null;
+    this.previewDataArray = null;
 
     this._detectCapabilities();
     this._init();
@@ -274,6 +281,172 @@
       this.canvasCtx = this.elements.canvas.getContext('2d');
       this._resizeCanvas();
       this._drawIdleVisualization();
+      if (this.options.liveVisualization) {
+        this._startPreviewVisualization();
+      }
+    }
+    
+    if (this.options.liveVisualization && (this.options.variant === 'mini' || this.options.variant === 'button')) {
+      this._startPreviewVisualization();
+    }
+  };
+
+  AudioRecorder.prototype._loadDeviceFromStorage = function() {
+    try {
+      return localStorage.getItem(STORAGE_KEY) || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  AudioRecorder.prototype._saveDeviceToStorage = function(deviceId) {
+    try {
+      if (deviceId) {
+        localStorage.setItem(STORAGE_KEY, deviceId);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) {}
+  };
+
+  AudioRecorder.prototype._startPreviewVisualization = function() {
+    var self = this;
+    
+    if (this.isRecording || this.previewStream) return;
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    
+    var constraints = { 
+      audio: this.selectedDeviceId 
+        ? { deviceId: { exact: this.selectedDeviceId } } 
+        : true 
+    };
+    
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(function(stream) {
+        if (self.isRecording) {
+          stream.getTracks().forEach(function(track) { track.stop(); });
+          return;
+        }
+        
+        self.previewStream = stream;
+        
+        var AudioContext = global.AudioContext || global.webkitAudioContext;
+        if (!AudioContext) return;
+        
+        if (!self.audioContext) {
+          self.audioContext = new AudioContext();
+        }
+        
+        self.previewAnalyser = self.audioContext.createAnalyser();
+        self.previewAnalyser.fftSize = 256;
+        
+        var source = self.audioContext.createMediaStreamSource(stream);
+        source.connect(self.previewAnalyser);
+        
+        self.previewDataArray = new Uint8Array(self.previewAnalyser.frequencyBinCount);
+        self._visualizePreview();
+      })
+      .catch(function(err) {
+        if (self.selectedDeviceId) {
+          self.selectedDeviceId = null;
+          self._saveDeviceToStorage(null);
+          self._startPreviewVisualization();
+        }
+      });
+  };
+
+  AudioRecorder.prototype._stopPreviewVisualization = function() {
+    if (this.previewAnimationFrame) {
+      cancelAnimationFrame(this.previewAnimationFrame);
+      this.previewAnimationFrame = null;
+    }
+    
+    if (this.previewStream) {
+      this.previewStream.getTracks().forEach(function(track) {
+        track.stop();
+      });
+      this.previewStream = null;
+    }
+    
+    this.previewAnalyser = null;
+    this.previewDataArray = null;
+  };
+
+  AudioRecorder.prototype._visualizePreview = function() {
+    var self = this;
+    
+    if (this.isRecording || !this.previewStream) return;
+    
+    this.previewAnimationFrame = requestAnimationFrame(function() {
+      self._visualizePreview();
+    });
+    
+    if (this.previewAnalyser) {
+      this.previewAnalyser.getByteFrequencyData(this.previewDataArray);
+    }
+    
+    if (this.options.variant === 'mini') {
+      this._updateLevelIndicatorPreview();
+    } else if (this.options.variant === 'button') {
+      this._updateButtonLevelPreview();
+    } else if (this.elements.canvas && this.canvasCtx) {
+      this._drawPreviewVisualization();
+    }
+  };
+
+  AudioRecorder.prototype._updateLevelIndicatorPreview = function() {
+    if (!this.elements.levelBar || !this.previewDataArray) return;
+    
+    var sum = 0;
+    for (var i = 0; i < this.previewDataArray.length; i++) {
+      sum += this.previewDataArray[i];
+    }
+    var average = sum / this.previewDataArray.length;
+    var level = Math.min(100, (average / 128) * 100);
+    
+    this.elements.levelBar.style.width = level + '%';
+  };
+
+  AudioRecorder.prototype._updateButtonLevelPreview = function() {
+    if (!this.elements.btnSingleLevelBar || !this.previewDataArray) return;
+    
+    var sum = 0;
+    for (var i = 0; i < this.previewDataArray.length; i++) {
+      sum += this.previewDataArray[i];
+    }
+    var average = sum / this.previewDataArray.length;
+    var level = Math.min(100, (average / 128) * 100);
+    
+    this.elements.btnSingleLevelBar.style.width = level + '%';
+  };
+
+  AudioRecorder.prototype._drawPreviewVisualization = function() {
+    var canvas = this.elements.canvas;
+    var ctx = this.canvasCtx;
+    var width = canvas.width;
+    var height = canvas.height;
+    var isDark = this.options.theme === 'dark';
+    
+    ctx.fillStyle = isDark ? '#1a1a2e' : '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    
+    if (!this.previewDataArray) return;
+    
+    var barWidth = (width / this.previewDataArray.length) * 2.5;
+    var x = 0;
+    
+    for (var i = 0; i < this.previewDataArray.length; i++) {
+      var barHeight = (this.previewDataArray[i] / 255) * height * 0.8;
+      
+      var gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
+      gradient.addColorStop(0, '#48dbfb');
+      gradient.addColorStop(1, isDark ? 'rgba(72, 219, 251, 0.3)' : 'rgba(72, 219, 251, 0.5)');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+      
+      x += barWidth + 1;
     }
   };
 
@@ -402,6 +575,8 @@
 
     if (this.isRecording) return;
 
+    this._stopPreviewVisualization();
+    
     this._setStatus('Requesting permission...');
     this.audioChunks = [];
     this.duration = 0;
@@ -861,6 +1036,10 @@
     this._resetLevelIndicator();
     this._resetButtonUI();
     
+    if (this.options.liveVisualization) {
+      this._startPreviewVisualization();
+    }
+    
     this.options.onData({
       blob: this.recordedBlob,
       url: this.recordedUrl,
@@ -928,6 +1107,10 @@
     }
     this._resetLevelIndicator();
     this._resetButtonUI();
+    
+    if (this.options.liveVisualization) {
+      this._startPreviewVisualization();
+    }
     
     this.options.onData({
       blob: this.recordedBlob,
@@ -1067,9 +1250,14 @@
     }
     this._resetLevelIndicator();
     this._resetButtonUI();
+    
+    if (this.options.liveVisualization) {
+      this._startPreviewVisualization();
+    }
   };
 
   AudioRecorder.prototype.destroy = function() {
+    this._stopPreviewVisualization();
     this.stop();
     this.reset();
     
@@ -1142,6 +1330,16 @@
         return d.kind === 'audioinput';
       });
       
+      var storedDeviceId = self.selectedDeviceId;
+      var deviceExists = storedDeviceId && self.audioDevices.some(function(d) {
+        return d.deviceId === storedDeviceId;
+      });
+      
+      if (storedDeviceId && !deviceExists) {
+        self.selectedDeviceId = null;
+        self._saveDeviceToStorage(null);
+      }
+      
       var select = self.elements.deviceSelect;
       var currentValue = self.selectedDeviceId || '';
       
@@ -1163,8 +1361,14 @@
 
   AudioRecorder.prototype._selectDevice = function(deviceId) {
     this.selectedDeviceId = deviceId || null;
+    this._saveDeviceToStorage(deviceId);
     this.options.onDeviceChange(deviceId, this._getSelectedDeviceLabel());
     this._hideSettings();
+    
+    if (this.options.liveVisualization && !this.isRecording) {
+      this._stopPreviewVisualization();
+      this._startPreviewVisualization();
+    }
   };
 
   AudioRecorder.prototype._getSelectedDeviceLabel = function() {

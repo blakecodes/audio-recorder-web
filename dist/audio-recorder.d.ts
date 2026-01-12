@@ -14,6 +14,7 @@ declare module 'audio-recorder-web' {
     showTimer?: boolean;
     showStatus?: boolean;
     showSettings?: boolean;
+    liveVisualization?: boolean;
     onStart?: () => void;
     onStop?: () => void;
     onPause?: () => void;
