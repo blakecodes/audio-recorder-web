@@ -2,7 +2,7 @@ declare module 'audio-recorder-web' {
   export interface AudioRecorderOptions {
     container: string | HTMLElement;
     theme?: 'dark' | 'light';
-    variant?: 'standard' | 'compact' | 'minimal' | 'mini';
+    variant?: 'standard' | 'compact' | 'minimal' | 'mini' | 'button';
     maxDuration?: number;
     sampleRate?: number;
     bitRate?: number;

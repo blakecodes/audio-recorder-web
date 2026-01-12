@@ -390,6 +390,22 @@
           <div id="recorder-compact"></div>
         </div>
       </div>
+      
+      <div class="demo-card">
+        <h3>🆕 Button Recorder (Dark)</h3>
+        <p>A single button that handles everything. Click to record, click again to stop. Shows timer and volume level.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-button"></div>
+        </div>
+      </div>
+      
+      <div class="demo-card" style="background: rgba(255,255,255,0.95);">
+        <h3 style="color: #1a1a2e;">🆕 Button Recorder (Light)</h3>
+        <p style="color: #6c757d;">Light themed button recorder, perfect for light backgrounds and forms.</p>
+        <div class="recorder-wrapper">
+          <div id="recorder-button-light"></div>
+        </div>
+      </div>
     </div>
     
     <div class="features">
@@ -540,6 +556,22 @@
         variant: 'compact',
         maxDuration: 120,
         onData: function(data) { console.log('Compact: Recording data:', data); }
+      });
+
+      var recorderButton = new AudioRecorder({
+        container: '#recorder-button',
+        theme: 'dark',
+        variant: 'button',
+        maxDuration: 60,
+        onData: function(data) { console.log('Button: Recording data:', data); }
+      });
+
+      var recorderButtonLight = new AudioRecorder({
+        container: '#recorder-button-light',
+        theme: 'light',
+        variant: 'button',
+        maxDuration: 60,
+        onData: function(data) { console.log('Button Light: Recording data:', data); }
       });
 
       console.log('AudioRecorder capabilities:', AudioRecorder.getCapabilities());

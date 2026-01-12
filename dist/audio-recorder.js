@@ -114,11 +114,24 @@
     var opts = this.options;
     var isMini = opts.variant === 'mini';
     var isMinimal = opts.variant === 'minimal';
+    var isButton = opts.variant === 'button';
     var variantClass = opts.variant !== 'standard' ? ' ar-variant-' + opts.variant : '';
     
     var html = ['<div class="ar-recorder ar-theme-' + opts.theme + variantClass + '">'];
     
-    if (isMini) {
+    if (isButton) {
+      html.push('  <button class="ar-btn-single" type="button" title="Click to record">');
+      html.push('    <div class="ar-btn-single-icon">');
+      html.push('      <svg class="ar-icon-mic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
+      html.push('      <svg class="ar-icon-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>');
+      html.push('    </div>');
+      html.push('    <div class="ar-btn-single-content">');
+      html.push('      <span class="ar-btn-single-label">Record</span>');
+      html.push('      <span class="ar-btn-single-timer">00:00</span>');
+      html.push('    </div>');
+      html.push('    <div class="ar-btn-single-level"><div class="ar-btn-single-level-bar"></div></div>');
+      html.push('  </button>');
+    } else if (isMini) {
       html.push('  <div class="ar-mini-wrapper">');
       html.push('    <div class="ar-level-indicator"><div class="ar-level-bar"></div></div>');
     } else if (!isMinimal) {
@@ -130,44 +143,46 @@
       html.push('  </div>');
     }
     
-    if (opts.showTimer && !isMini) {
-      html.push('  <div class="ar-timer">00:00</div>');
-    }
-    
-    html.push('  <div class="ar-controls">');
-    html.push('    <button class="ar-btn ar-btn-record" type="button" title="Record">');
-    html.push('      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>');
-    html.push('    </button>');
-    
-    if (opts.showPause) {
-      html.push('    <button class="ar-btn ar-btn-pause" type="button" title="Pause" disabled>');
-      html.push('      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>');
-      html.push('    </button>');
-    }
-    
-    html.push('    <button class="ar-btn ar-btn-stop" type="button" title="Stop" disabled>');
-    html.push('      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>');
-    html.push('    </button>');
-    
-    if (opts.showPlay) {
-      html.push('    <button class="ar-btn ar-btn-play" type="button" title="Play" disabled>');
-      html.push('      <svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>');
-      html.push('    </button>');
-    }
-    
-    if (opts.showDownload) {
-      html.push('    <button class="ar-btn ar-btn-download" type="button" title="Download" disabled>');
-      html.push('      <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6z"/><path d="M4 18h16v2H4z"/></svg>');
-      html.push('    </button>');
-    }
-    
-    html.push('  </div>');
-    
-    if (isMini) {
-      if (opts.showTimer) {
-        html.push('    <div class="ar-timer ar-mini-timer">00:00</div>');
+    if (!isButton) {
+      if (opts.showTimer && !isMini) {
+        html.push('  <div class="ar-timer">00:00</div>');
       }
+      
+      html.push('  <div class="ar-controls">');
+      html.push('    <button class="ar-btn ar-btn-record" type="button" title="Record">');
+      html.push('      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>');
+      html.push('    </button>');
+      
+      if (opts.showPause) {
+        html.push('    <button class="ar-btn ar-btn-pause" type="button" title="Pause" disabled>');
+        html.push('      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>');
+        html.push('    </button>');
+      }
+      
+      html.push('    <button class="ar-btn ar-btn-stop" type="button" title="Stop" disabled>');
+      html.push('      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>');
+      html.push('    </button>');
+      
+      if (opts.showPlay) {
+        html.push('    <button class="ar-btn ar-btn-play" type="button" title="Play" disabled>');
+        html.push('      <svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>');
+        html.push('    </button>');
+      }
+      
+      if (opts.showDownload) {
+        html.push('    <button class="ar-btn ar-btn-download" type="button" title="Download" disabled>');
+        html.push('      <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6z"/><path d="M4 18h16v2H4z"/></svg>');
+        html.push('    </button>');
+      }
+      
       html.push('  </div>');
+      
+      if (isMini) {
+        if (opts.showTimer) {
+          html.push('    <div class="ar-timer ar-mini-timer">00:00</div>');
+        }
+        html.push('  </div>');
+      }
     }
     
     html.push('  <div class="ar-flash-container"></div>');
@@ -189,7 +204,11 @@
       flashContainer: this.container.querySelector('.ar-flash-container'),
       error: this.container.querySelector('.ar-error'),
       levelIndicator: this.container.querySelector('.ar-level-indicator'),
-      levelBar: this.container.querySelector('.ar-level-bar')
+      levelBar: this.container.querySelector('.ar-level-bar'),
+      btnSingle: this.container.querySelector('.ar-btn-single'),
+      btnSingleLabel: this.container.querySelector('.ar-btn-single-label'),
+      btnSingleTimer: this.container.querySelector('.ar-btn-single-timer'),
+      btnSingleLevelBar: this.container.querySelector('.ar-btn-single-level-bar')
     };
 
     if (this.elements.canvas) {
@@ -208,9 +227,21 @@
   AudioRecorder.prototype._bindEvents = function() {
     var self = this;
 
-    this.elements.btnRecord.addEventListener('click', function() {
-      self.start();
-    });
+    if (this.elements.btnSingle) {
+      this.elements.btnSingle.addEventListener('click', function() {
+        if (self.isRecording) {
+          self.stop();
+        } else {
+          self.start();
+        }
+      });
+    }
+
+    if (this.elements.btnRecord) {
+      this.elements.btnRecord.addEventListener('click', function() {
+        self.start();
+      });
+    }
 
     if (this.elements.btnPause) {
       this.elements.btnPause.addEventListener('click', function() {
@@ -222,9 +253,11 @@
       });
     }
 
-    this.elements.btnStop.addEventListener('click', function() {
-      self.stop();
-    });
+    if (this.elements.btnStop) {
+      this.elements.btnStop.addEventListener('click', function() {
+        self.stop();
+      });
+    }
 
     if (this.elements.btnPlay) {
       this.elements.btnPlay.addEventListener('click', function() {
@@ -424,11 +457,18 @@
     this._updateButtons('recording');
     this.elements.recorder.classList.add('ar-recording');
     
+    if (this.elements.btnSingle) {
+      this.elements.btnSingle.classList.add('ar-btn-single-recording');
+      if (this.elements.btnSingleLabel) {
+        this.elements.btnSingleLabel.textContent = 'Stop';
+      }
+    }
+    
     this._startTimer();
     
     if (stream && this.hasAudioContext) {
       this._initVisualization(stream);
-    } else if (this.options.variant !== 'mini' && this.elements.canvas) {
+    } else if (this.options.variant !== 'mini' && this.options.variant !== 'button' && this.elements.canvas) {
       this._drawRecordingVisualization();
     }
     
@@ -465,7 +505,7 @@
       this.analyser.getByteFrequencyData(this.dataArray);
     }
     
-    if (this.options.variant === 'mini') {
+    if (this.options.variant === 'mini' || this.options.variant === 'button') {
       this._updateLevelIndicator();
     } else if (this.elements.canvas) {
       this._drawVisualization();
@@ -473,7 +513,7 @@
   };
 
   AudioRecorder.prototype._updateLevelIndicator = function() {
-    if (!this.elements.levelBar || !this.dataArray) return;
+    if (!this.dataArray) return;
     
     var sum = 0;
     for (var i = 0; i < this.dataArray.length; i++) {
@@ -482,14 +522,23 @@
     var average = sum / this.dataArray.length;
     var level = Math.min(100, (average / 255) * 150);
     
-    this.elements.levelBar.style.width = level + '%';
-    
+    var color;
     if (level > 70) {
-      this.elements.levelBar.style.background = '#ff6b6b';
+      color = '#ff6b6b';
     } else if (level > 40) {
-      this.elements.levelBar.style.background = '#feca57';
+      color = '#feca57';
     } else {
-      this.elements.levelBar.style.background = '#48dbfb';
+      color = '#48dbfb';
+    }
+    
+    if (this.elements.levelBar) {
+      this.elements.levelBar.style.width = level + '%';
+      this.elements.levelBar.style.background = color;
+    }
+    
+    if (this.elements.btnSingleLevelBar) {
+      this.elements.btnSingleLevelBar.style.width = level + '%';
+      this.elements.btnSingleLevelBar.style.background = color;
     }
   };
 
@@ -604,15 +653,19 @@
   };
 
   AudioRecorder.prototype._updateTimer = function() {
-    if (!this.elements.timer) return;
-    
     var minutes = Math.floor(this.duration / 60);
     var seconds = this.duration % 60;
     
     var display = (minutes < 10 ? '0' : '') + minutes + ':' + 
                   (seconds < 10 ? '0' : '') + seconds;
     
-    this.elements.timer.textContent = display;
+    if (this.elements.timer) {
+      this.elements.timer.textContent = display;
+    }
+    
+    if (this.elements.btnSingleTimer) {
+      this.elements.btnSingleTimer.textContent = display;
+    }
   };
 
   AudioRecorder.prototype.pause = function() {
@@ -710,6 +763,7 @@
       this._drawIdleVisualization();
     }
     this._resetLevelIndicator();
+    this._resetButtonUI();
     
     this.options.onData({
       blob: this.recordedBlob,
@@ -718,10 +772,23 @@
     });
   };
 
+  AudioRecorder.prototype._resetButtonUI = function() {
+    if (this.elements.btnSingle) {
+      this.elements.btnSingle.classList.remove('ar-btn-single-recording');
+      if (this.elements.btnSingleLabel) {
+        this.elements.btnSingleLabel.textContent = 'Record';
+      }
+    }
+  };
+
   AudioRecorder.prototype._resetLevelIndicator = function() {
     if (this.elements.levelBar) {
       this.elements.levelBar.style.width = '0%';
       this.elements.levelBar.style.background = '#48dbfb';
+    }
+    if (this.elements.btnSingleLevelBar) {
+      this.elements.btnSingleLevelBar.style.width = '0%';
+      this.elements.btnSingleLevelBar.style.background = '#48dbfb';
     }
   };
 
@@ -764,6 +831,7 @@
       this._drawIdleVisualization();
     }
     this._resetLevelIndicator();
+    this._resetButtonUI();
     
     this.options.onData({
       blob: this.recordedBlob,
@@ -902,6 +970,7 @@
       this._drawIdleVisualization();
     }
     this._resetLevelIndicator();
+    this._resetButtonUI();
   };
 
   AudioRecorder.prototype.destroy = function() {

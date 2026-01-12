@@ -242,6 +242,22 @@ var recorder = new AudioRecorder({
 });
 ```
 
+### Button Recorder (NEW!)
+
+A single button that handles everything - click to record, click again to stop. Shows timer and volume level inside the button:
+
+```javascript
+var recorder = new AudioRecorder({
+  container: '#recorder',
+  variant: 'button',
+  theme: 'dark',
+  maxDuration: 60,
+  onData: function(data) {
+    console.log('Recording complete!', data.blob);
+  }
+});
+```
+
 ### Record-Only (Simplified)
 
 Hide all buttons except record and stop for simple voice capture:
