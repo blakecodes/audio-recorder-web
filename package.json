@@ -1,6 +1,6 @@
 {
   "name": "audio-recorder-web",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A powerful, embeddable audio recording widget with cross-browser compatibility",
   "main": "dist/audio-recorder.js",
   "module": "dist/audio-recorder.esm.js",
